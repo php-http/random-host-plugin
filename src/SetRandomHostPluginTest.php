@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ostrolucky\RandomHostHttplugPlugin;
+namespace PhpHttpPlugin;
 
 use Closure;
 use Http\Client\Common\Plugin\RetryPlugin;
@@ -15,7 +15,7 @@ use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
-class RandomHostPluginTest extends TestCase
+class SetRandomHostPluginTest extends TestCase
 {
     public function testUriReplacements(): void
     {
@@ -23,7 +23,7 @@ class RandomHostPluginTest extends TestCase
 
         $client = new PluginClient(
             $mockClient,
-            [new RandomHostPlugin(new Psr17Factory(), ['hosts' => 'https://foo.bar.baz:800'])],
+            [new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'https://foo.bar.baz:800'])],
         );
 
         $client->sendRequest(new Request('PUT', '/foo'));
@@ -41,7 +41,7 @@ class RandomHostPluginTest extends TestCase
 
         $client = new PluginClient(
             $mockClient,
-            [new RandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.bar.baz,https://bar.baz.foo'])],
+            [new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.bar.baz,https://bar.baz.foo'])],
         );
 
         $client->sendRequest(new Request('GET', '/foo'));
@@ -64,7 +64,7 @@ class RandomHostPluginTest extends TestCase
             $mockClient,
             [
                 new RetryPlugin(['error_response_delay' => fn () => 0]),
-                new RandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.bar.baz']),
+                new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.bar.baz']),
             ],
         );
 
@@ -85,7 +85,7 @@ class RandomHostPluginTest extends TestCase
             $mockClient,
             [
                 new RetryPlugin(['error_response_delay' => fn () => 0]),
-                new RandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.com,https://bar.com,https://baz.com']),
+                new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.com,https://bar.com,https://baz.com']),
             ],
         );
 
@@ -107,7 +107,7 @@ class RandomHostPluginTest extends TestCase
             $mockClient,
             [
                 new RetryPlugin(['error_response_delay' => fn () => 0]),
-                new RandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.com,https://bar.com,https://baz.com']),
+                new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.com,https://bar.com,https://baz.com']),
             ],
         );
 

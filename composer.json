@@ -1,5 +1,5 @@
 {
-    "name": "ostrolucky/random-host-httplug-plugin",
+    "name": "phphttp-plugin/use-random-host",
     "description": "Client-side round robin load balancer plugin for HTTPlug",
     "license": "MIT",
     "keywords": [
@@ -31,7 +31,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Ostrolucky\\RandomHostHttplugPlugin\\": "src/"
+            "PhpHttpPlugin\\": "src/"
         }
     },
     "config": {

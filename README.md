@@ -1,4 +1,4 @@
-#  ostrolucky/random-host-httplug-plugin
+#  phphttp-plugin/use-random-host
 
 You might have found yourself in strange situation where instead of people using load balancer,
 they supply you list of hosts you should try to call. They also don't like it when you pick one of them
@@ -14,12 +14,12 @@ This ensures same host is never used twice in a row in case you use some retry m
 Via [Composer](https://getcomposer.org/doc/00-intro.md)
 
 ```bash
-composer require ostrolucky/random-host-httplug-plugin
+composer require phphttp-plugin/use-random-host
 ```
 ## Usage
 
 ```php
-new \Ostrolucky\RandomHostHttplugPlugin\RandomHostPlugin(
+new \PhpHttpPlugin\SetRandomHostPlugin(
     $psr17Factory,
     ['hosts' => 'https://host1.example,https://host2.example'],
 );

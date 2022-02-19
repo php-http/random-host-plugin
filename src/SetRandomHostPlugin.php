@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ostrolucky\RandomHostHttplugPlugin;
+namespace PhpHttpPlugin;
 
 use Http\Client\Common\Plugin;
 use Http\Client\Exception\NetworkException;
@@ -17,7 +17,7 @@ use function array_rand;
 use function array_values;
 use function explode;
 
-final class RandomHostPlugin implements Plugin
+final class SetRandomHostPlugin implements Plugin
 {
     private UriFactoryInterface $uriFactory;
     /** @var list<string> */
