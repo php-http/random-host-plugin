@@ -28,7 +28,7 @@ class SetRandomHostPluginTest extends TestCase
 
     public function testUriReplacements(): void
     {
-        $this->createClient('https://foo.bar.baz:800')->sendRequest(new Request('PUT', '/foo'));
+        $this->createClient(['hosts' => 'https://foo.bar.baz:800'])->sendRequest(new Request('PUT', '/foo'));
 
         $uri = $this->mockClient->getLastRequest()->getUri();
         $this->assertSame('https', $uri->getScheme());
@@ -39,7 +39,7 @@ class SetRandomHostPluginTest extends TestCase
 
     public function testStickiness(): void
     {
-        $client = $this->createClient('http://foo.bar.baz,https://bar.baz.foo');
+        $client = $this->createClient(['hosts' => 'http://foo.bar.baz,https://bar.baz.foo']);
 
         $client->sendRequest(new Request('GET', '/foo'));
         $client->sendRequest(new Request('GET', '/bar'));
@@ -56,7 +56,7 @@ class SetRandomHostPluginTest extends TestCase
     {
         $this->mockClient->addResponse(new Response(500));
 
-        $this->createClient('http://foo.bar.baz', true)->sendRequest(new Request('GET', '/foo'));
+        $this->createClient(['hosts' => 'http://foo.bar.baz'], true)->sendRequest(new Request('GET', '/foo'));
         $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertEquals($requests[0]->getUri(), $requests[1]->getUri());
@@ -67,7 +67,7 @@ class SetRandomHostPluginTest extends TestCase
         $request = new Request('GET', '/foo');
         $this->mockClient->addException(new RequestException('foo', $request));
 
-        $this->createClient('http://foo.com,https://bar.com,https://baz.com', true)->sendRequest($request);
+        $this->createClient(['hosts' => 'http://foo.com,https://bar.com,https://baz.com'], true)->sendRequest($request);
         $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertEquals($requests[0]->getUri(), $requests[1]->getUri());
@@ -80,11 +80,17 @@ class SetRandomHostPluginTest extends TestCase
     {
         $errorProvider($this->mockClient);
 
-        $this->createClient('http://foo.com,https://bar.com', true)->sendRequest(new Request('GET', '/foo'));
+        $this->createClient(['hosts' => 'http://foo.com,https://bar.com'], true)->sendRequest(new Request('GET', '/'));
 
         $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertNotEquals($requests[0]->getUri()->getHost(), $requests[1]->getUri()->getHost());
+    }
+
+    public function testThrowsExceptionWithoutHostsKey(): void
+    {
+        $this->expectExceptionMessage('The required option "hosts" is missing.');
+        $this->createClient([]);
     }
 
     /**
@@ -98,16 +104,11 @@ class SetRandomHostPluginTest extends TestCase
         ];
     }
 
-    private function createClient(string $hosts, bool $shouldRetry = false): ClientInterface
+    /** @param array{hosts?: string} $config */
+    private function createClient(array $config, bool $shouldRetry = false): ClientInterface
     {
         $plugins = $shouldRetry ? [new RetryPlugin(['error_response_delay' => fn () => 0])] : [];
 
-        return new PluginClient(
-            $this->mockClient,
-            [
-                ...$plugins,
-                new SetRandomHostPlugin(new Psr17Factory(), ['hosts' => $hosts]),
-            ],
-        );
+        return new PluginClient($this->mockClient, [...$plugins, new SetRandomHostPlugin(new Psr17Factory(), $config)]);
     }
 }

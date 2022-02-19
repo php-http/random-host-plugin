@@ -31,7 +31,7 @@ final class SetRandomHostPlugin implements Plugin
     {
         $this->uriFactory = $uriFactory;
         $resolver = new OptionsResolver();
-        $resolver->setDefined('hosts');
+        $resolver->setRequired('hosts');
         $resolver->setAllowedTypes('hosts', 'string');
 
         $this->hosts = explode(',', $resolver->resolve($config)['hosts']);
