@@ -14,18 +14,16 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "php-http/client-common": "^2.0",
-        "php-http/httplug": "^2.2",
-        "php-http/message": "^1.0"
+        "php": ">=7.4",
+        "php-http/client-common": ">=2.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.23",
-        "nyholm/psr7": "^1.5",
-        "php-http/discovery": "^1.14",
-        "php-http/mock-client": "^1.5",
+        "nyholm/psr7": "^1.0",
+        "php-http/mock-client": "*",
         "phpunit/phpunit": "^9.5",
-        "ramsey/coding-standard": "^2.0"
+        "ramsey/coding-standard": "^2.0",
+        "php-http/httplug": "^2.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
