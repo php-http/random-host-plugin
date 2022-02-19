@@ -25,6 +25,7 @@ jobs:
         with:
           php-version: "latest"
           coverage: "none"
+          tools: "composer-normalize"
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v2"
@@ -32,6 +33,9 @@ jobs:
       - name: "Check coding standards (PHP_CodeSniffer)"
         shell: "bash"
         run: "vendor/bin/phpcs"
+
+      - name: "Check that composer.json is normalized"
+        run: "composer-normalize"
 
   unit-tests:
     name: "Unit tests"
@@ -65,4 +69,4 @@ jobs:
 
       - name: "Run unit tests (PHPUnit)"
         shell: "bash"
-        run: "vendor/bin/phpunit"
+        run: "vendor/bin/simple-phpunit"
