@@ -10,25 +10,27 @@ use Http\Client\Common\PluginClient;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Mock\Client;
+use Nyholm\Psr7\Factory\HttplugFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientInterface;
 
 class SetRandomHostPluginTest extends TestCase
 {
+    private Client $mockClient;
+
+    protected function setUp(): void
+    {
+        $this->mockClient = new Client(new HttplugFactory());
+    }
+
     public function testUriReplacements(): void
     {
-        $mockClient = new Client();
+        $this->createClient('https://foo.bar.baz:800')->sendRequest(new Request('PUT', '/foo'));
 
-        $client = new PluginClient(
-            $mockClient,
-            [new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'https://foo.bar.baz:800'])],
-        );
-
-        $client->sendRequest(new Request('PUT', '/foo'));
-
-        $uri = $mockClient->getLastRequest()->getUri();
+        $uri = $this->mockClient->getLastRequest()->getUri();
         $this->assertSame('https', $uri->getScheme());
         $this->assertSame('foo.bar.baz', $uri->getHost());
         $this->assertSame(800, $uri->getPort());
@@ -37,16 +39,11 @@ class SetRandomHostPluginTest extends TestCase
 
     public function testStickiness(): void
     {
-        $mockClient = new Client();
-
-        $client = new PluginClient(
-            $mockClient,
-            [new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.bar.baz,https://bar.baz.foo'])],
-        );
+        $client = $this->createClient('http://foo.bar.baz,https://bar.baz.foo');
 
         $client->sendRequest(new Request('GET', '/foo'));
         $client->sendRequest(new Request('GET', '/bar'));
-        $requests = $mockClient->getRequests();
+        $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertEquals(
             $requests[0]->getUri()->getHost(),
@@ -57,20 +54,10 @@ class SetRandomHostPluginTest extends TestCase
 
     public function testSwapAttemptWithSingleHostIsErrorFree(): void
     {
-        $mockClient = new Client();
-        $mockClient->addResponse(new Response(500));
+        $this->mockClient->addResponse(new Response(500));
 
-        $client = new PluginClient(
-            $mockClient,
-            [
-                new RetryPlugin(['error_response_delay' => fn () => 0]),
-                new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.bar.baz']),
-            ],
-        );
-
-        $request = new Request('GET', '/foo');
-        $client->sendRequest($request);
-        $requests = $mockClient->getRequests();
+        $this->createClient('http://foo.bar.baz', true)->sendRequest(new Request('GET', '/foo'));
+        $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertEquals($requests[0]->getUri(), $requests[1]->getUri());
     }
@@ -78,19 +65,10 @@ class SetRandomHostPluginTest extends TestCase
     public function testNoSwapOnRequestExceptions(): void
     {
         $request = new Request('GET', '/foo');
-        $mockClient = new Client();
-        $mockClient->addException(new RequestException('foo', $request));
+        $this->mockClient->addException(new RequestException('foo', $request));
 
-        $client = new PluginClient(
-            $mockClient,
-            [
-                new RetryPlugin(['error_response_delay' => fn () => 0]),
-                new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.com,https://bar.com,https://baz.com']),
-            ],
-        );
-
-        $client->sendRequest($request);
-        $requests = $mockClient->getRequests();
+        $this->createClient('http://foo.com,https://bar.com,https://baz.com', true)->sendRequest($request);
+        $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertEquals($requests[0]->getUri(), $requests[1]->getUri());
     }
@@ -100,20 +78,11 @@ class SetRandomHostPluginTest extends TestCase
      */
     public function testSwappingWithMultipleHosts(Closure $errorProvider): void
     {
-        $mockClient = new Client();
-        $errorProvider($mockClient);
+        $errorProvider($this->mockClient);
 
-        $client = new PluginClient(
-            $mockClient,
-            [
-                new RetryPlugin(['error_response_delay' => fn () => 0]),
-                new UseRandomHostPlugin(new Psr17Factory(), ['hosts' => 'http://foo.com,https://bar.com,https://baz.com']),
-            ],
-        );
+        $this->createClient('http://foo.com,https://bar.com', true)->sendRequest(new Request('GET', '/foo'));
 
-        $request = new Request('GET', '/foo');
-        $client->sendRequest($request);
-        $requests = $mockClient->getRequests();
+        $requests = $this->mockClient->getRequests();
         $this->assertCount(2, $requests);
         $this->assertNotEquals($requests[0]->getUri()->getHost(), $requests[1]->getUri()->getHost());
     }
@@ -127,5 +96,18 @@ class SetRandomHostPluginTest extends TestCase
             [fn (Client $client) => $client->addResponse(new Response(500))],
             [fn (Client $client) => $client->addException(new NetworkException('Foo', new Request('GET', '')))],
         ];
+    }
+
+    private function createClient(string $hosts, bool $shouldRetry = false): ClientInterface
+    {
+        $plugins = $shouldRetry ? [new RetryPlugin(['error_response_delay' => fn () => 0])] : [];
+
+        return new PluginClient(
+            $this->mockClient,
+            [
+                ...$plugins,
+                new SetRandomHostPlugin(new Psr17Factory(), ['hosts' => $hosts]),
+            ],
+        );
     }
 }

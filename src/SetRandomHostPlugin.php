@@ -33,9 +33,8 @@ final class SetRandomHostPlugin implements Plugin
         $resolver = new OptionsResolver();
         $resolver->setDefined('hosts');
         $resolver->setAllowedTypes('hosts', 'string');
-        $hosts = $resolver->resolve($config)['hosts'];
 
-        $this->hosts = explode(',', $hosts);
+        $this->hosts = explode(',', $resolver->resolve($config)['hosts']);
         $this->currentHostIndex = array_rand($this->hosts);
     }
 
