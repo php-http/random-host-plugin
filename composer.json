@@ -1,5 +1,5 @@
 {
-    "name": "phphttp-plugin/use-random-host",
+    "name": "phphttp-plugin/set-random-host",
     "description": "Client-side round robin load balancer plugin for HTTPlug",
     "license": "MIT",
     "keywords": [
