@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpHttpPlugin;
+namespace Http\Client\Common\Plugin;
 
 use Http\Client\Common\Plugin;
 use Http\Client\Exception\NetworkException;

@@ -1,5 +1,5 @@
 {
-    "name": "phphttp-plugin/set-random-host",
+    "name": "php-http/random-host-plugin",
     "description": "Client-side round robin load balancer plugin for HTTPlug",
     "license": "MIT",
     "keywords": [
@@ -13,11 +13,7 @@
             "email": "gabriel.ostrolucky@gmail.com"
         }
     ],
-    "homepage": "https://github.com/ostrolucky/httplug-plugin-use-random-host",
-    "support": {
-        "issues": "https://github.com/ostrolucky/httplug-plugin-use-random-host/issues",
-        "source": "https://github.com/ostrolucky/httplug-plugin-use-random-host"
-    },
+    "homepage": "https://github.com/php-http/random-host-plugin",
     "require": {
         "php": ">=7.4",
         "php-http/client-common": ">=2.0",
@@ -34,7 +30,12 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "PhpHttpPlugin\\": "src/"
+            "Http\\Client\\Common\\Plugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Http\\Client\\Common\\Plugin\\": "tests/"
         }
     },
     "config": {

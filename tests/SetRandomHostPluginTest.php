@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpHttpPlugin;
+namespace Tests\Http\Client\Common\Plugin;
 
 use Closure;
 use Http\Client\Common\Plugin\RetryPlugin;
+use Http\Client\Common\Plugin\SetRandomHostPlugin;
 use Http\Client\Common\PluginClient;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;

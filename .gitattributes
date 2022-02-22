@@ -4,4 +4,4 @@
 /.github export-ignore
 /.phpcs.xml.dist export-ignore
 /.phpunit.xml.dist export-ignore
-/src/SetRandomHostPluginTest.php export-ignore
+/tests export-ignore
