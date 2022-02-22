@@ -20,7 +20,8 @@
     },
     "require": {
         "php": ">=7.4",
-        "php-http/client-common": ">=2.0"
+        "php-http/client-common": ">=2.0",
+        "symfony/options-resolver": ">=3.4"
     },
     "require-dev": {
         "nyholm/psr7": "^1.0",

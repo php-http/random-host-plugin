@@ -21,7 +21,7 @@ composer require phphttp-plugin/use-random-host
 ```php
 new \PhpHttpPlugin\SetRandomHostPlugin(
     $psr17Factory,
-    ['hosts' => 'https://host1.example,https://host2.example'],
+    ['hosts' => ['https://host1.example','https://host2.example']],
 );
 ```
 

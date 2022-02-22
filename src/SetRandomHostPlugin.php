@@ -15,7 +15,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use function array_rand;
 use function array_values;
-use function explode;
 
 final class SetRandomHostPlugin implements Plugin
 {
@@ -32,9 +31,9 @@ final class SetRandomHostPlugin implements Plugin
         $this->uriFactory = $uriFactory;
         $resolver = new OptionsResolver();
         $resolver->setRequired('hosts');
-        $resolver->setAllowedTypes('hosts', 'string');
+        $resolver->setAllowedTypes('hosts', 'string[]');
 
-        $this->hosts = explode(',', $resolver->resolve($config)['hosts']);
+        $this->hosts = array_values($resolver->resolve($config)['hosts']);
         $this->currentHostIndex = array_rand($this->hosts);
     }
 
