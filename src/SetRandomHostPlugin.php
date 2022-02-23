@@ -11,6 +11,7 @@ use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -25,7 +26,7 @@ final class SetRandomHostPlugin implements Plugin
      *
      * Only protocol, host and port are used. Paths should not be set and are ignored.
      *
-     * @var list<string>
+     * @var UriInterface[]
      */
     private array $hosts = [];
     private int $currentHostIndex;
