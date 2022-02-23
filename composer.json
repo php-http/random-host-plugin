@@ -15,18 +15,17 @@
     ],
     "homepage": "https://github.com/php-http/random-host-plugin",
     "require": {
-        "php": ">=7.4",
-        "php-http/client-common": ">=2.0",
-        "symfony/options-resolver": ">=3.4"
+        "php": "^7.4 || ^8.0",
+        "php-http/client-common": "^2.0",
+        "symfony/options-resolver": "^3.4 || ^4.4 || ^5.4 || ^6.0"
     },
     "require-dev": {
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^2.0",
-        "php-http/mock-client": "*",
+        "php-http/mock-client": "^1.0",
         "ramsey/coding-standard": "^2.0",
-        "symfony/phpunit-bridge": ">=6.0"
+        "symfony/phpunit-bridge": "^6.0"
     },
-    "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
