@@ -108,8 +108,14 @@ class SetRandomHostPluginTest extends TestCase
 
     public function testThrowsExceptionWithEmptyArray(): void
     {
-        $this->expectExceptionMessage('The option "hosts" with value array is invalid.');
+        $this->expectExceptionMessage('List of hosts must not be empty');
         $this->createClient(['hosts' => []]);
+    }
+
+    public function testThrowsExceptionWithInvalidUrls(): void
+    {
+        $this->expectExceptionMessage('URL "foo.bar" is not valid (doesn\'t contain host or scheme?)');
+        $this->createClient(['hosts' => ['foo.bar']]);
     }
 
     /**

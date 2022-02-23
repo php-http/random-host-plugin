@@ -11,16 +11,24 @@ use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use function array_rand;
 use function array_values;
+use function sprintf;
 
 final class SetRandomHostPlugin implements Plugin
 {
-    private UriFactoryInterface $uriFactory;
-    /** @var list<string> */
-    private array $hosts;
+    /**
+     * A list of base URLs
+     *
+     * Only protocol, host and port are used. Paths should not be set and are ignored.
+     *
+     * @var list<UriInterface>
+     */
+    private array $hosts = [];
     private int $currentHostIndex;
 
     /**
@@ -28,19 +36,29 @@ final class SetRandomHostPlugin implements Plugin
      */
     public function __construct(UriFactoryInterface $uriFactory, array $config)
     {
-        $this->uriFactory = $uriFactory;
         $resolver = new OptionsResolver();
         $resolver->setRequired('hosts');
         $resolver->setAllowedTypes('hosts', 'string[]');
-        $resolver->setAllowedValues('hosts', fn (array $hosts) => (bool) $hosts);
 
-        $this->hosts = array_values($resolver->resolve($config)['hosts']);
+        if (!$hosts = $resolver->resolve($config)['hosts']) {
+            throw new InvalidOptionsException('List of hosts must not be empty');
+        }
+
+        foreach ($hosts as $host) {
+            $this->hosts[] = $uri = $uriFactory->createUri($host);
+            if (!$uri->getHost()) {
+                throw new InvalidOptionsException(
+                    sprintf('URL "%s" is not valid (doesn\'t contain host or scheme?)', $host),
+                );
+            }
+        }
+
         $this->currentHostIndex = array_rand($this->hosts);
     }
 
     public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
     {
-        $uri = $this->uriFactory->createUri($this->hosts[$this->currentHostIndex]);
+        $uri = $this->hosts[$this->currentHostIndex];
 
         $request = $request->withUri($request->getUri()
             ->withHost($uri->getHost())
