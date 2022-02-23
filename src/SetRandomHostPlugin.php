@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Http\Client\Common\Plugin;
 
 use Http\Client\Common\Plugin;
-use Http\Client\Exception\NetworkException;
 use Http\Promise\Promise;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -65,8 +65,7 @@ final class SetRandomHostPlugin implements Plugin
                 return $response;
             },
             function (ClientExceptionInterface $exception) {
-                // we should check for Psr\Http\Client\NetworkExceptionInterface here, to be psr-18 compliant
-                if ($exception instanceof NetworkException) {
+                if ($exception instanceof NetworkExceptionInterface) {
                     $this->swapCurrentHost();
                 }
 
