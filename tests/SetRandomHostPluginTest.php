@@ -106,6 +106,12 @@ class SetRandomHostPluginTest extends TestCase
         $this->createClient(['hosts' => 'https://foo.com']);
     }
 
+    public function testThrowsExceptionWithEmptyArray(): void
+    {
+        $this->expectExceptionMessage('The option "hosts" with value array is invalid.');
+        $this->createClient(['hosts' => []]);
+    }
+
     /**
      * @return callable[][]
      */
