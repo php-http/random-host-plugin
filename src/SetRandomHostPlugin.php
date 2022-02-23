@@ -24,7 +24,7 @@ final class SetRandomHostPlugin implements Plugin
     private int $currentHostIndex;
 
     /**
-     * @param array{hosts: string} $config
+     * @param array{hosts: non-empty-array<string>} $config
      */
     public function __construct(UriFactoryInterface $uriFactory, array $config)
     {
@@ -32,6 +32,7 @@ final class SetRandomHostPlugin implements Plugin
         $resolver = new OptionsResolver();
         $resolver->setRequired('hosts');
         $resolver->setAllowedTypes('hosts', 'string[]');
+        $resolver->setAllowedValues('hosts', fn (array $hosts) => (bool) $hosts);
 
         $this->hosts = array_values($resolver->resolve($config)['hosts']);
         $this->currentHostIndex = array_rand($this->hosts);
